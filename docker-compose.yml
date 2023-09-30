@@ -1,0 +1,46 @@
+version: "3"
+
+services:
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - /etc/letsencrypt/live/:/etc/nginx/certs/:ro
+      - /etc/letsencrypt/archive:/etc/nginx/archive/:ro
+    depends_on:
+      - fastapi
+      - nextjs
+    networks:
+      - my-network
+
+  fastapi:
+    build: ./backend
+    volumes:
+      - ./backend:/app/backend/
+        #- /opt/vBeast-panel/db.sqlite3:/app/db.sqlite3
+        #- /opt/vBeast-panel/db.sqlite3-shm:/app/db.sqlite3-shm
+        #- /opt/vBeast-panel/db.sqlite3-wal:/app/db.sqlite3-wal
+        #ports:
+        #- "1337:1337"
+    networks:
+      - my-network
+
+  nextjs:
+    build: ./frontend
+    #volumes:
+      # - ./frontend:/app/frontend/
+      #ports:
+      #- "3000:3000"
+    networks:
+      - my-network
+
+volumes:
+  nginx:
+  fastapi:
+    #nextjs:
+
+networks:
+  my-network:
